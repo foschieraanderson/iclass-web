@@ -35,5 +35,16 @@ export const gradeSubmissionSchema = z.object({
   feedback: z.string().optional(),
 })
 
+export function createGradeSchema(maxScore: number) {
+  return z.object({
+    grade: z
+      .number()
+      .int('Deve ser um número inteiro.')
+      .min(0, 'Mínimo 0.')
+      .max(maxScore, `Máximo ${maxScore}.`),
+    feedback: z.string().optional(),
+  })
+}
+
 export type Submission = z.infer<typeof submissionSchema>
 export type GradeSubmissionRequest = z.infer<typeof gradeSubmissionSchema>

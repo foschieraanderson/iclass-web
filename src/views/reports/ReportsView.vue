@@ -317,7 +317,7 @@ watch(selectedTaskId, loadSubmissions)
               <TableCell class="font-medium">{{ sub.student.name }}</TableCell>
               <TableCell class="text-sm">{{ formatDate(sub.createdAt) }}</TableCell>
               <TableCell class="text-center">
-                <span v-if="sub.grade !== null">{{ sub.grade }}</span>
+                <span v-if="sub.grade !== null">{{ sub.grade }}/{{ sub.task.score }}</span>
                 <span v-else class="text-muted-foreground">—</span>
               </TableCell>
               <TableCell class="max-w-48 truncate text-sm">

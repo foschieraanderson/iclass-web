@@ -5,7 +5,7 @@ import { toast } from 'vue-sonner'
 import { ArrowLeft, Download } from '@lucide/vue'
 import { useAuthStore } from '@/stores/auth.store'
 import { submissionService } from '@/services/submission'
-import { gradeSubmissionSchema } from '@/schemas/submission.schema'
+import { createGradeSchema } from '@/schemas/submission.schema'
 import type { Submission } from '@/schemas/submission.schema'
 import { triggerFileDownload } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
@@ -58,7 +58,7 @@ async function handleDownload() {
 async function handleGrade() {
   gradeErrors.value = {}
 
-  const result = gradeSubmissionSchema.safeParse({
+  const result = createGradeSchema(submission.value!.task.score).safeParse({
     grade: gradeForm.value.grade !== '' ? Number(gradeForm.value.grade) : undefined,
     feedback: gradeForm.value.feedback || undefined,
   })
@@ -137,7 +137,7 @@ onMounted(async () => {
           <div>
             <p class="text-xs text-muted-foreground uppercase tracking-wide">Nota atual</p>
             <Badge v-if="submission.grade !== null" variant="default" class="mt-1">
-              {{ submission.grade }}/100
+              {{ submission.grade }}/{{ submission.task.score }}
             </Badge>
             <Badge v-else variant="secondary" class="mt-1">Pendente</Badge>
           </div>
@@ -182,14 +182,14 @@ onMounted(async () => {
 
         <form class="space-y-4 max-w-sm" @submit.prevent="handleGrade">
           <div class="space-y-2">
-            <Label for="grade">Nota (0 – 100)</Label>
+            <Label for="grade">Nota (0 – {{ submission.task.score }})</Label>
             <Input
               id="grade"
               v-model="gradeForm.grade"
               type="number"
               min="0"
-              max="100"
-              placeholder="Ex: 85"
+              :max="submission.task.score"
+              :placeholder="`Ex: ${submission.task.score}`"
             />
             <p v-if="gradeErrors.grade" class="text-xs text-destructive">{{ gradeErrors.grade }}</p>
           </div>

@@ -176,7 +176,7 @@ onMounted(loadData)
             <h2 class="font-semibold">Sua resposta</h2>
             <div class="flex items-center gap-2">
               <Badge v-if="mySubmission.grade !== null" variant="default">
-                {{ mySubmission.grade }}/100
+                {{ mySubmission.grade }}/{{ task.score }}
               </Badge>
               <Badge v-else variant="secondary">Aguardando correção</Badge>
             </div>
@@ -308,7 +308,7 @@ onMounted(loadData)
                     <span v-else class="text-muted-foreground">—</span>
                   </TableCell>
                   <TableCell>
-                    <Badge v-if="sub.grade !== null" variant="default">{{ sub.grade }}/100</Badge>
+                    <Badge v-if="sub.grade !== null" variant="default">{{ sub.grade }}/{{ task.score }}</Badge>
                     <Badge v-else variant="secondary">Pendente</Badge>
                   </TableCell>
                   <TableCell>{{ formatDate(sub.gradedAt) }}</TableCell>
