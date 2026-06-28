@@ -23,6 +23,7 @@ import {
   BreadcrumbPage,
 } from '@/components/ui/breadcrumb'
 import { Separator } from '@/components/ui/separator'
+import ThemeToggle from '@/components/ThemeToggle.vue'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -174,6 +175,9 @@ function handleLogout() {
             </BreadcrumbItem>
           </BreadcrumbList>
         </Breadcrumb>
+        <div class="ml-auto">
+          <ThemeToggle />
+        </div>
       </header>
 
       <main class="flex flex-1 flex-col gap-4 p-6">
