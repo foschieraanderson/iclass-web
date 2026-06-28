@@ -7,20 +7,10 @@ import { useAuthStore } from '@/stores/auth.store'
 import { taskService } from '@/services/task'
 import { submissionService } from '@/services/submission'
 import { triggerFileDownload } from '@/lib/utils'
-import { gradeSubmissionSchema } from '@/schemas/submission.schema'
 import type { Task } from '@/schemas/task.schema'
 import type { Submission } from '@/schemas/submission.schema'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import {
   Table,
@@ -45,13 +35,6 @@ const submitText = ref('')
 const submitFile = ref<File | null>(null)
 const submitFileError = ref('')
 const submitting = ref(false)
-
-// teacher grade dialog
-const gradeDialogOpen = ref(false)
-const submissionToGrade = ref<Submission | null>(null)
-const gradeForm = ref({ grade: '', feedback: '' })
-const gradeErrors = ref<Record<string, string>>({})
-const grading = ref(false)
 
 function formatDate(iso: string | null | undefined): string {
   if (!iso) return '—'
@@ -127,46 +110,6 @@ async function handleSubmit() {
     }
   } finally {
     submitting.value = false
-  }
-}
-
-function openGradeDialog(sub: Submission) {
-  submissionToGrade.value = sub
-  gradeForm.value = {
-    grade: sub.grade !== null ? String(sub.grade) : '',
-    feedback: sub.feedback ?? '',
-  }
-  gradeErrors.value = {}
-  gradeDialogOpen.value = true
-}
-
-async function handleGrade() {
-  gradeErrors.value = {}
-
-  const result = gradeSubmissionSchema.safeParse({
-    grade: gradeForm.value.grade !== '' ? Number(gradeForm.value.grade) : undefined,
-    feedback: gradeForm.value.feedback || undefined,
-  })
-
-  if (!result.success) {
-    result.error.issues.forEach((issue) => {
-      const key = String(issue.path[0] ?? 'general')
-      gradeErrors.value[key] = issue.message
-    })
-    return
-  }
-
-  grading.value = true
-  try {
-    const updated = await submissionService.grade(submissionToGrade.value!.id, result.data)
-    const idx = submissions.value.findIndex((s) => s.id === updated.id)
-    if (idx !== -1) submissions.value[idx] = updated
-    gradeDialogOpen.value = false
-    toast.success('Avaliação salva com sucesso.')
-  } catch {
-    toast.error('Erro ao avaliar submissão.')
-  } finally {
-    grading.value = false
   }
 }
 
@@ -330,16 +273,20 @@ onMounted(loadData)
                   <TableHead>Arquivo</TableHead>
                   <TableHead>Nota</TableHead>
                   <TableHead>Corrigido em</TableHead>
-                  <TableHead class="w-24 text-right">Ação</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 <TableRow v-if="submissions.length === 0">
-                  <TableCell colspan="6" class="py-8 text-center text-muted-foreground">
+                  <TableCell colspan="5" class="py-8 text-center text-muted-foreground">
                     Nenhuma submissão ainda.
                   </TableCell>
                 </TableRow>
-                <TableRow v-for="sub in submissions" :key="sub.id">
+                <TableRow
+                  v-for="sub in submissions"
+                  :key="sub.id"
+                  class="cursor-pointer"
+                  @click="router.push({ name: 'submission-detail', params: { id: sub.id } })"
+                >
                   <TableCell class="font-medium">{{ sub.student.name }}</TableCell>
                   <TableCell class="max-w-[200px]">
                     <p v-if="sub.textAnswer" class="truncate text-sm text-muted-foreground">
@@ -353,7 +300,7 @@ onMounted(loadData)
                       href="#"
                       target="_blank"
                       class="inline-flex items-center gap-1 text-sm text-primary underline underline-offset-2"
-                      @click.prevent="handleDownloadSubmission(sub.id)"
+                      @click.prevent.stop="handleDownloadSubmission(sub.id)"
                     >
                       <Download class="size-3.5" />
                       baixar PDF
@@ -365,11 +312,6 @@ onMounted(loadData)
                     <Badge v-else variant="secondary">Pendente</Badge>
                   </TableCell>
                   <TableCell>{{ formatDate(sub.gradedAt) }}</TableCell>
-                  <TableCell class="text-right">
-                    <Button variant="outline" size="sm" @click="openGradeDialog(sub)">
-                      Avaliar
-                    </Button>
-                  </TableCell>
                 </TableRow>
               </TableBody>
             </Table>
@@ -378,58 +320,5 @@ onMounted(loadData)
       </template>
     </template>
 
-    <!-- Dialog avaliação -->
-    <Dialog v-model:open="gradeDialogOpen">
-      <DialogContent class="sm:max-w-sm">
-        <DialogHeader>
-          <DialogTitle>Avaliar submissão</DialogTitle>
-          <DialogDescription class="sr-only">
-            Informe a nota e o feedback para a submissão de
-            {{ submissionToGrade?.student.name }}.
-          </DialogDescription>
-        </DialogHeader>
-
-        <form class="space-y-4" @submit.prevent="handleGrade">
-          <p class="text-sm text-muted-foreground">
-            Aluno: <strong class="text-foreground">{{ submissionToGrade?.student.name }}</strong>
-          </p>
-
-          <div class="space-y-2">
-            <Label for="grade">Nota (0 – 100)</Label>
-            <Input
-              id="grade"
-              v-model="gradeForm.grade"
-              type="number"
-              min="0"
-              max="100"
-              placeholder="Ex: 85"
-            />
-            <p v-if="gradeErrors.grade" class="text-xs text-destructive">{{ gradeErrors.grade }}</p>
-          </div>
-
-          <div class="space-y-2">
-            <Label for="feedback">
-              Feedback <span class="text-muted-foreground">(opcional)</span>
-            </Label>
-            <textarea
-              id="feedback"
-              v-model="gradeForm.feedback"
-              rows="3"
-              placeholder="Comentários para o aluno..."
-              class="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
-            />
-          </div>
-
-          <DialogFooter>
-            <Button type="button" variant="outline" @click="gradeDialogOpen = false">
-              Cancelar
-            </Button>
-            <Button type="submit" :disabled="grading">
-              {{ grading ? 'Salvando...' : 'Salvar avaliação' }}
-            </Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
   </div>
 </template>
