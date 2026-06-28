@@ -41,9 +41,13 @@ const navItems = [
   { name: 'home', label: 'Home', icon: House },
   { name: 'classes', label: 'Turmas', icon: BookOpen },
   { name: 'tasks', label: 'Tarefas', icon: ClipboardList },
-  { name: 'users', label: 'Usuários', icon: Users },
+  { name: 'users', label: 'Usuários', icon: Users, adminOnly: true },
   { name: 'about', label: 'About', icon: Info },
 ]
+
+const visibleNavItems = computed(() =>
+  navItems.filter((item) => !item.adminOnly || authStore.isAdmin),
+)
 
 const extraLabels: Record<string, string> = {
   'task-detail': 'Detalhe da Tarefa',
@@ -100,7 +104,7 @@ function handleLogout() {
 
       <SidebarContent>
         <SidebarMenu>
-          <SidebarMenuItem v-for="item in navItems" :key="item.name">
+          <SidebarMenuItem v-for="item in visibleNavItems" :key="item.name">
             <SidebarMenuButton as-child :is-active="route.name === item.name" :tooltip="item.label">
               <RouterLink :to="{ name: item.name }">
                 <component :is="item.icon" />

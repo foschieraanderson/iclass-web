@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/auth.store'
 declare module 'vue-router' {
   interface RouteMeta {
     requiresAuth?: boolean
+    requiresAdmin?: boolean
   }
 }
 
@@ -33,6 +34,7 @@ const router = createRouter({
         {
           path: 'users',
           name: 'users',
+          meta: { requiresAdmin: true },
           component: () => import('@/views/users/UsersView.vue'),
         },
         {
@@ -78,6 +80,10 @@ router.beforeEach(async (to) => {
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     return { name: 'login', query: { redirect: to.name?.toString() } }
+  }
+
+  if (to.meta.requiresAdmin && !authStore.isAdmin) {
+    return { name: 'home' }
   }
 
   if (to.name === 'login' && authStore.isAuthenticated) {

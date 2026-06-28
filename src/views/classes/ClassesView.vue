@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { toast } from 'vue-sonner'
 import { Pencil, Plus, Trash2 } from '@lucide/vue'
 import { useAuthStore } from '@/stores/auth.store'
@@ -49,6 +49,14 @@ import {
 const authStore = useAuthStore()
 
 const classes = ref<Class[]>([])
+
+const filteredClasses = computed(() => {
+  if (authStore.isAdmin) return classes.value
+  if (authStore.isTeacher) {
+    return classes.value.filter((c) => c.teacher.id === authStore.user?.id)
+  }
+  return classes.value.filter((c) => c.students.some((s) => s.id === authStore.user?.id))
+})
 const teachers = ref<User[]>([])
 const students = ref<User[]>([])
 const loading = ref(false)
@@ -230,7 +238,7 @@ onMounted(loadData)
               Nenhuma turma encontrada.
             </TableCell>
           </TableRow>
-          <TableRow v-for="cls in classes" :key="cls.id">
+          <TableRow v-for="cls in filteredClasses" :key="cls.id">
             <TableCell class="font-medium">{{ cls.code }}</TableCell>
             <TableCell>{{ cls.teacher.name }}</TableCell>
             <TableCell>{{ cls.students.length }}</TableCell>

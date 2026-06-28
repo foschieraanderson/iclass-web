@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
 import { Pencil, Plus, Trash2 } from '@lucide/vue'
 import { useAuthStore } from '@/stores/auth.store'
@@ -45,6 +46,7 @@ import {
 } from '@/components/ui/table'
 
 const authStore = useAuthStore()
+const router = useRouter()
 
 const users = ref<User[]>([])
 const loading = ref(false)
@@ -173,7 +175,13 @@ async function handleDelete() {
   }
 }
 
-onMounted(loadUsers)
+onMounted(async () => {
+  if (!authStore.isAdmin) {
+    router.replace({ name: 'home' })
+    return
+  }
+  await loadUsers()
+})
 </script>
 
 <template>

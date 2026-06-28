@@ -56,6 +56,11 @@ const apiUrl = import.meta.env.VITE_API_URL as string
 const tasks = ref<Task[]>([])
 const classes = ref<Class[]>([])
 const mySubmissions = ref<Submission[]>([])
+
+const availableClasses = computed(() => {
+  if (authStore.isAdmin) return classes.value
+  return classes.value.filter((c) => c.teacher.id === authStore.user?.id)
+})
 const loading = ref(false)
 
 const dialogOpen = ref(false)
@@ -342,7 +347,7 @@ onMounted(loadData)
                 <SelectValue placeholder="Selecione a turma" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem v-for="cls in classes" :key="cls.id" :value="cls.id">
+                <SelectItem v-for="cls in availableClasses" :key="cls.id" :value="cls.id">
                   {{ cls.code }}
                 </SelectItem>
               </SelectContent>
