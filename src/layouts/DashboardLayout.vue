@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { RouterView, RouterLink, useRoute, useRouter } from 'vue-router'
-import { BookOpen, ClipboardList, GraduationCap, House, Info, KeyRound, LogOut, Users } from '@lucide/vue'
+import { BookOpen, ClipboardList, FileBarChart2, GraduationCap, House, Info, KeyRound, LogOut, Users } from '@lucide/vue'
 import { useAuthStore } from '@/stores/auth.store'
 import {
   Sidebar,
@@ -42,12 +42,17 @@ const navItems = [
   { name: 'home', label: 'Home', icon: House },
   { name: 'classes', label: 'Turmas', icon: BookOpen },
   { name: 'tasks', label: 'Tarefas', icon: ClipboardList },
+  { name: 'reports', label: 'Relatórios', icon: FileBarChart2, teacherOrAdmin: true },
   { name: 'users', label: 'Usuários', icon: Users, adminOnly: true },
   { name: 'about', label: 'About', icon: Info },
 ]
 
 const visibleNavItems = computed(() =>
-  navItems.filter((item) => !item.adminOnly || authStore.isAdmin),
+  navItems.filter((item) => {
+    if (item.adminOnly && !authStore.isAdmin) return false
+    if (item.teacherOrAdmin && !authStore.isAdmin && !authStore.isTeacher) return false
+    return true
+  }),
 )
 
 const extraLabels: Record<string, string> = {
