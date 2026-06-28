@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
+import { toast } from 'vue-sonner'
 import { userService } from '@/services/user'
 import { changePasswordSchema } from '@/schemas/user.schema'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -13,8 +14,6 @@ const confirmNewPassword = ref('')
 
 const touched = ref({ currentPassword: false, newPassword: false, confirmNewPassword: false })
 const fieldErrors = ref({ currentPassword: '', newPassword: '', confirmNewPassword: '' })
-const apiError = ref('')
-const success = ref(false)
 const submitting = ref(false)
 
 function validateField(field: keyof typeof touched.value) {
@@ -46,23 +45,20 @@ async function handleSubmit() {
   const hasErrors = Object.values(fieldErrors.value).some((e) => e !== '')
   if (hasErrors) return
 
-  apiError.value = ''
-  success.value = false
   submitting.value = true
-
   try {
     await userService.changePassword({
       currentPassword: currentPassword.value,
       newPassword: newPassword.value,
     })
-    success.value = true
+    toast.success('Senha alterada com sucesso.')
     currentPassword.value = ''
     newPassword.value = ''
     confirmNewPassword.value = ''
     touched.value = { currentPassword: false, newPassword: false, confirmNewPassword: false }
     fieldErrors.value = { currentPassword: '', newPassword: '', confirmNewPassword: '' }
   } catch {
-    apiError.value = 'Senha atual incorreta ou erro ao alterar senha.'
+    toast.error('Senha atual incorreta ou erro ao alterar senha.')
   } finally {
     submitting.value = false
   }
@@ -116,9 +112,6 @@ async function handleSubmit() {
               {{ fieldErrors.confirmNewPassword }}
             </p>
           </div>
-
-          <p v-if="apiError" class="text-sm text-destructive">{{ apiError }}</p>
-          <p v-if="success" class="text-sm text-green-600">Senha alterada com sucesso.</p>
 
           <Button type="submit" class="w-full" :disabled="submitting">
             {{ submitting ? 'Salvando...' : 'Alterar senha' }}

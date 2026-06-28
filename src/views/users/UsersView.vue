@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
+import { toast } from 'vue-sonner'
 import { Pencil, Plus, Trash2 } from '@lucide/vue'
 import { useAuthStore } from '@/stores/auth.store'
 import { userService } from '@/services/user'
@@ -123,6 +124,9 @@ async function handleSubmit() {
       await userService.create(result.data)
       dialogOpen.value = false
       await loadUsers()
+      toast.success('Usuário criado com sucesso.')
+    } catch {
+      toast.error('Erro ao criar usuário.')
     } finally {
       submitting.value = false
     }
@@ -145,6 +149,9 @@ async function handleSubmit() {
       await userService.update(selectedUser.value!.id, result.data)
       dialogOpen.value = false
       await loadUsers()
+      toast.success('Usuário atualizado com sucesso.')
+    } catch {
+      toast.error('Erro ao atualizar usuário.')
     } finally {
       submitting.value = false
     }
@@ -158,6 +165,9 @@ async function handleDelete() {
     await userService.remove(userToDelete.value.id)
     deleteDialogOpen.value = false
     await loadUsers()
+    toast.success('Usuário excluído com sucesso.')
+  } catch {
+    toast.error('Erro ao excluir usuário.')
   } finally {
     deleting.value = false
   }
