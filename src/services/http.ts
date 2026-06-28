@@ -1,5 +1,12 @@
 import axios from 'axios'
 
+type LogoutFn = () => void
+let _logout: LogoutFn | null = null
+
+export function setLogoutHandler(fn: LogoutFn): void {
+  _logout = fn
+}
+
 const http = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   headers: { 'Content-Type': 'application/json' },
@@ -30,8 +37,7 @@ http.interceptors.response.use(
           original.headers.Authorization = `Bearer ${data.accessToken}`
           return http(original)
         } catch {
-          localStorage.removeItem('accessToken')
-          localStorage.removeItem('refreshToken')
+          _logout?.()
         }
       }
     }
