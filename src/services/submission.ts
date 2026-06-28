@@ -34,4 +34,12 @@ export const submissionService = {
     const response = await http.patch<Submission>(`/api/v1/submissions/${id}`, data)
     return response.data
   },
+
+  async downloadFile(id: string): Promise<{ blob: Blob; filename: string }> {
+    const response = await http.get(`/api/v1/submissions/${id}/download`, { responseType: 'blob' })
+    const disposition: string = response.headers['content-disposition'] ?? ''
+    const match = disposition.match(/filename="(.+)"/)
+    const filename = match?.[1] ?? 'arquivo.pdf'
+    return { blob: response.data as Blob, filename }
+  },
 }

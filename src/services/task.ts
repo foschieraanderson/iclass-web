@@ -60,4 +60,12 @@ export const taskService = {
   async remove(id: string): Promise<void> {
     await http.delete(`/api/v1/tasks/${id}`)
   },
+
+  async downloadFile(id: string): Promise<{ blob: Blob; filename: string }> {
+    const response = await http.get(`/api/v1/tasks/${id}/file`, { responseType: 'blob' })
+    const disposition: string = response.headers['content-disposition'] ?? ''
+    const match = disposition.match(/filename="(.+)"/)
+    const filename = match?.[1] ?? 'arquivo.pdf'
+    return { blob: response.data as Blob, filename }
+  },
 }

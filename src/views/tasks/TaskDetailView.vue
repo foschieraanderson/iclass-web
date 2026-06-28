@@ -2,10 +2,11 @@
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { toast } from 'vue-sonner'
-import { ArrowLeft, FileText } from '@lucide/vue'
+import { ArrowLeft, Download } from '@lucide/vue'
 import { useAuthStore } from '@/stores/auth.store'
 import { taskService } from '@/services/task'
 import { submissionService } from '@/services/submission'
+import { triggerFileDownload } from '@/lib/utils'
 import { gradeSubmissionSchema } from '@/schemas/submission.schema'
 import type { Task } from '@/schemas/task.schema'
 import type { Submission } from '@/schemas/submission.schema'
@@ -33,7 +34,6 @@ import {
 const route = useRoute()
 const router = useRouter()
 const authStore = useAuthStore()
-const apiUrl = import.meta.env.VITE_API_URL as string
 
 const task = ref<Task | null>(null)
 const submissions = ref<Submission[]>([])
@@ -58,8 +58,22 @@ function formatDate(iso: string | null | undefined): string {
   return new Date(iso).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
 }
 
-function fileLink(url: string): string {
-  return `${apiUrl}${url}`
+async function handleDownloadTaskFile() {
+  try {
+    const { blob, filename } = await taskService.downloadFile(task.value!.id)
+    triggerFileDownload(blob, filename)
+  } catch {
+    toast.error('Erro ao baixar arquivo da tarefa.')
+  }
+}
+
+async function handleDownloadSubmission(submissionId: string) {
+  try {
+    const { blob, filename } = await submissionService.downloadFile(submissionId)
+    triggerFileDownload(blob, filename)
+  } catch {
+    toast.error('Erro ao baixar arquivo da submissão.')
+  }
 }
 
 async function loadData() {
@@ -194,12 +208,13 @@ onMounted(loadData)
           <div v-if="task.fileUrl">
             <p class="text-xs text-muted-foreground uppercase tracking-wide">Arquivo</p>
             <a
-              :href="fileLink(task.fileUrl)"
+              href="#"
               target="_blank"
               class="inline-flex items-center gap-1 text-sm text-primary underline underline-offset-2"
+              @click.prevent="handleDownloadTaskFile()"
             >
-              <FileText class="size-3.5" />
-              ver PDF
+              <Download class="size-3.5" />
+              baixar PDF
             </a>
           </div>
         </div>
@@ -234,12 +249,13 @@ onMounted(loadData)
           <div v-if="mySubmission.fileUrl">
             <p class="text-xs text-muted-foreground uppercase tracking-wide mb-1">Arquivo</p>
             <a
-              :href="fileLink(mySubmission.fileUrl)"
+              href="#"
               target="_blank"
               class="inline-flex items-center gap-1 text-sm text-primary underline underline-offset-2"
+              @click.prevent="handleDownloadSubmission(mySubmission.id)"
             >
-              <FileText class="size-3.5" />
-              ver PDF enviado
+              <Download class="size-3.5" />
+              baixar PDF enviado
             </a>
           </div>
 
@@ -334,12 +350,13 @@ onMounted(loadData)
                   <TableCell>
                     <a
                       v-if="sub.fileUrl"
-                      :href="fileLink(sub.fileUrl)"
+                      href="#"
                       target="_blank"
                       class="inline-flex items-center gap-1 text-sm text-primary underline underline-offset-2"
+                      @click.prevent="handleDownloadSubmission(sub.id)"
                     >
-                      <FileText class="size-3.5" />
-                      PDF
+                      <Download class="size-3.5" />
+                      baixar PDF
                     </a>
                     <span v-else class="text-muted-foreground">—</span>
                   </TableCell>

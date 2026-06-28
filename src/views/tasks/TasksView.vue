@@ -6,6 +6,7 @@ import { Pencil, Plus, Trash2 } from '@lucide/vue'
 import { useAuthStore } from '@/stores/auth.store'
 import { classService } from '@/services/class'
 import { taskService } from '@/services/task'
+import { triggerFileDownload } from '@/lib/utils'
 import { submissionService } from '@/services/submission'
 import { createTaskSchema, updateTaskSchema, FIBONACCI_VALUES } from '@/schemas/task.schema'
 import type { Task } from '@/schemas/task.schema'
@@ -51,7 +52,6 @@ import {
 
 const router = useRouter()
 const authStore = useAuthStore()
-const apiUrl = import.meta.env.VITE_API_URL as string
 
 const tasks = ref<Task[]>([])
 const classes = ref<Class[]>([])
@@ -137,6 +137,16 @@ async function loadData() {
 function onFileChange(event: Event) {
   const input = event.target as HTMLInputElement
   selectedFile.value = input.files?.[0] ?? null
+}
+
+async function handleDownloadCurrentTaskFile() {
+  if (!selectedTask.value?.id) return
+  try {
+    const { blob, filename } = await taskService.downloadFile(selectedTask.value.id)
+    triggerFileDownload(blob, filename)
+  } catch {
+    toast.error('Erro ao baixar arquivo.')
+  }
 }
 
 function openCreateDialog() {
@@ -402,11 +412,12 @@ onMounted(loadData)
             <div v-if="dialogMode === 'edit' && selectedTask?.fileUrl" class="text-sm">
               <span class="text-muted-foreground">Atual: </span>
               <a
-                :href="`${apiUrl}${selectedTask.fileUrl}`"
+                href="#"
                 target="_blank"
                 class="text-primary underline underline-offset-2"
+                @click.prevent="handleDownloadCurrentTaskFile()"
               >
-                ver arquivo
+                baixar arquivo
               </a>
             </div>
             <input
