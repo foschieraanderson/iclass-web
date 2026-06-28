@@ -25,6 +25,11 @@ const router = createRouter({
           name: 'about',
           component: () => import('@/views/AboutView.vue'),
         },
+        {
+          path: 'users',
+          name: 'users',
+          component: () => import('@/views/users/UsersView.vue'),
+        },
       ],
     },
     {
@@ -40,7 +45,7 @@ const router = createRouter({
   ],
 })
 
-router.beforeEach(async (to, _from, next) => {
+router.beforeEach(async (to) => {
   const authStore = useAuthStore()
 
   if (!authStore.isAuthenticated) {
@@ -52,11 +57,11 @@ router.beforeEach(async (to, _from, next) => {
   }
 
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    next({ name: 'login', query: { redirect: to.name?.toString() } })
-  } else if (to.name === 'login' && authStore.isAuthenticated) {
-    next({ name: 'home' })
-  } else {
-    next()
+    return { name: 'login', query: { redirect: to.name?.toString() } }
+  }
+
+  if (to.name === 'login' && authStore.isAuthenticated) {
+    return { name: 'home' }
   }
 })
 

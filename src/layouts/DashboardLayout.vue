@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { RouterView, RouterLink, useRoute, useRouter } from 'vue-router'
-import { GraduationCap, House, Info, LogOut } from '@lucide/vue'
+import { GraduationCap, House, Info, LogOut, Users } from '@lucide/vue'
 import { useAuthStore } from '@/stores/auth.store'
 import {
   Sidebar,
@@ -39,6 +39,7 @@ const authStore = useAuthStore()
 
 const navItems = [
   { name: 'home', label: 'Home', icon: House },
+  { name: 'users', label: 'Usuários', icon: Users },
   { name: 'about', label: 'About', icon: Info },
 ]
 
