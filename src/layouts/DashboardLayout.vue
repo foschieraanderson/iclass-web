@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { RouterView, RouterLink, useRoute, useRouter } from 'vue-router'
-import { GraduationCap, House, Info, LogOut, Users } from '@lucide/vue'
+import { GraduationCap, House, Info, KeyRound, LogOut, Users } from '@lucide/vue'
 import { useAuthStore } from '@/stores/auth.store'
 import {
   Sidebar,
@@ -129,6 +129,10 @@ function handleLogout() {
                   <span class="font-medium">{{ authStore.user?.name }}</span>
                   <span class="text-xs text-muted-foreground font-normal">{{ authStore.user?.email }}</span>
                 </DropdownMenuLabel>
+                <DropdownMenuItem class="cursor-pointer" @click="router.push({ name: 'change-password' })">
+                  <KeyRound class="mr-2 size-4" />
+                  Alterar senha
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem class="cursor-pointer text-destructive focus:text-destructive" @click="handleLogout">
                   <LogOut class="mr-2 size-4" />

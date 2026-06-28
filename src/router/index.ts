@@ -30,6 +30,11 @@ const router = createRouter({
           name: 'users',
           component: () => import('@/views/users/UsersView.vue'),
         },
+        {
+          path: 'change-password',
+          name: 'change-password',
+          component: () => import('@/views/accounts/ChangePasswordView.vue'),
+        },
       ],
     },
     {
