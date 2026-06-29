@@ -40,8 +40,10 @@ async function handleLogin() {
 <template>
   <div class="flex min-h-screen items-center justify-center bg-background px-4">
     <Card class="w-full max-w-sm">
-      <CardHeader>
-        <CardTitle class="text-2xl">iClass</CardTitle>
+      <CardHeader class="flex flex-col gap-4 items-center">
+        <CardTitle class="text-2xl">
+            <img class="max-w-3xs" src="../../assets/Iclasslogo.png" alt="Logo IClass" />
+        </CardTitle>
         <CardDescription>Acesse sua conta para continuar</CardDescription>
       </CardHeader>
       <CardContent>

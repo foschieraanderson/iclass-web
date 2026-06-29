@@ -44,7 +44,7 @@ const navItems = [
   { name: 'tasks', label: 'Tarefas', icon: ClipboardList },
   { name: 'reports', label: 'Relatórios', icon: FileBarChart2, teacherOrAdmin: true },
   { name: 'users', label: 'Usuários', icon: Users, adminOnly: true },
-  { name: 'about', label: 'About', icon: Info },
+  { name: 'about', label: 'Sobre', icon: Info },
 ]
 
 const visibleNavItems = computed(() =>
@@ -94,9 +94,9 @@ function handleLogout() {
             <SidebarMenuButton size="lg" as-child>
               <RouterLink :to="{ name: 'home' }">
                 <div
-                  class="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground"
+                  class="flex aspect-square size-8 items-center justify-center"
                 >
-                  <GraduationCap class="size-4" />
+                  <img class="h-full" src="../assets/IclassIcon.png" alt="Icon Iclass" />
                 </div>
                 <div class="flex flex-col gap-0.5 leading-none">
                   <span class="font-semibold">iClass</span>
