@@ -42,6 +42,15 @@ jobs:
       - name: SPA routing fix (404 → index)
         run: cp dist/index.html dist/404.html
 
+      - name: Set Pages source to GitHub Actions
+        run: |
+          gh api repos/${{ github.repository }}/pages \
+            --method PUT -f build_type=workflow 2>/dev/null || \
+          gh api repos/${{ github.repository }}/pages \
+            --method POST -f build_type=workflow
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - uses: actions/configure-pages@v4
         with:
           enablement: true
