@@ -2,7 +2,8 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
   workflow_dispatch:
 
 permissions:
@@ -15,49 +16,36 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v4
         with:
-          version: 10
+          version: 9
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
           cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
+      - name: Install dependencies
+        run: pnpm install
 
-      - run: pnpm build
-        env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}
-          VITE_BASE_URL: /iclass-web/
-
-      - name: SPA routing fix (404 → index)
-        run: cp dist/index.html dist/404.html
-
-      - name: Set Pages source to GitHub Actions
-        run: |
-          gh api repos/${{ github.repository }}/pages \
-            --method PUT -f build_type=workflow 2>/dev/null || \
-          gh api repos/${{ github.repository }}/pages \
-            --method POST -f build_type=workflow
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - uses: actions/configure-pages@v4
-        with:
-          enablement: true
+      - name: Build
+        run: pnpm build
 
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
       - uses: actions/deploy-pages@v4
         id: deployment
