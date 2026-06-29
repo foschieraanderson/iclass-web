@@ -58,7 +58,7 @@ const submissionMap = computed(() => {
   for (const student of classReport.value.students) {
     map[student.id] = {}
     for (const sub of student.submissions) {
-      map[student.id][sub.taskId] = sub
+      map[student.id]![sub.taskId] = sub
     }
   }
   return map
@@ -227,8 +227,8 @@ watch(selectedTaskId, loadSubmissions)
                 class="text-center"
               >
                 <template v-if="submissionMap[student.id]?.[task.id]?.submitted">
-                  <span v-if="submissionMap[student.id][task.id].grade !== null">
-                    {{ submissionMap[student.id][task.id].grade }}
+                  <span v-if="submissionMap[student.id]?.[task.id]?.grade !== null">
+                    {{ submissionMap[student.id]?.[task.id]?.grade }}
                   </span>
                   <Badge v-else variant="secondary">Entregue</Badge>
                 </template>

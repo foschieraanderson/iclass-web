@@ -52,7 +52,7 @@ function getLast6MonthKeys(): string[] {
 }
 
 function formatMonthKey(key: string): string {
-  const [year, month] = key.split('-')
+  const [year, month] = key.split('-') as [string, string]
   return `${PT_MONTHS[parseInt(month) - 1]}/${year.slice(2)}`
 }
 
@@ -73,9 +73,9 @@ const studentBarData = computed(() => {
   for (const sub of mySubmissions.value) {
     const d = new Date(sub.createdAt)
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
-    if (key in counts) counts[key]++
+    if (key in counts) counts[key] = (counts[key] ?? 0) + 1
   }
-  return keys.map((k) => counts[k])
+  return keys.map((k) => counts[k] ?? 0)
 })
 
 const studentLineData = computed(() => {
@@ -85,10 +85,10 @@ const studentLineData = computed(() => {
     if (sub.grade === null) continue
     const d = new Date(sub.createdAt)
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
-    if (key in grades) grades[key].push(sub.grade)
+    if (key in grades) (grades[key] ?? []).push(sub.grade)
   }
   return keys.map((k) => {
-    const arr = grades[k]
+    const arr = grades[k] ?? []
     return arr.length > 0 ? Math.round(arr.reduce((a, b) => a + b, 0) / arr.length) : 0
   })
 })
