@@ -49,12 +49,11 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-      VITE_API_URL: ${{ secrets.VITE_API_URL }}
     steps:
       - name: Criar .env
         run: |
           cat <<EOF > .env
-          DATABASE_URL=${{ secrets.VITE_API_URL }}
+          VITE_API_URL=${{ secrets.VITE_API_URL }}
           NODE_ENV=production
           EOF
     steps:
