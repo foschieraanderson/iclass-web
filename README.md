@@ -4,8 +4,8 @@ Frontend da plataforma iClass — interface para gestão de turmas, tarefas e su
 
 ## Demo
 
-- **[Demo]**(hppts://foschieraanderson.github.io/iclass-web)
-- **[Repositório da API]**(https://github.com/foschieraanderson/iclass-api)
+- **[Demo](https://foschieraanderson.github.io/iclass-web)**
+- **[Repositório da API](https://github.com/foschieraanderson/iclass-api)**
 
 ## Tecnologias
 
