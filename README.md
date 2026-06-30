@@ -2,6 +2,11 @@
 
 Frontend da plataforma iClass — interface para gestão de turmas, tarefas e submissões.
 
+## Demo
+
+- **[Demo]**(hppts://foschieraanderson.github.io/iclass-web)
+- **[Repositório da API]**(https://github.com/foschieraanderson/iclass-api)
+
 ## Tecnologias
 
 - **[Vue 3](https://vuejs.org/)** + **[TypeScript](https://www.typescriptlang.org/)** — Composition API com `<script setup>`
