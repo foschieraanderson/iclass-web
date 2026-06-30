@@ -50,12 +50,5 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
-      - name: Criar .env
-        run: |
-          cat <<EOF > .env
-          VITE_API_URL=${{ secrets.VITE_API_URL }}
-          NODE_ENV=production
-          EOF
-    steps:
       - uses: actions/deploy-pages@v4
         id: deployment
